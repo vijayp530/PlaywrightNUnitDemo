@@ -47,10 +47,7 @@ jobs:
 
     # 6. Execute NUnit tests and generate TRX
     - name: Run Playwright NUnit Tests
-      run: |
-        dotnet test \
-        --configuration Release \
-        --logger "trx;LogFileName=test-results.trx"
+      run: dotnet test --configuration Release --logger "trx;LogFileName=test-results.trx"
       continue-on-error: true
 
 
@@ -61,11 +58,7 @@ jobs:
 
     # 8. Convert TRX to HTML report
     - name: Generate HTML Test Report
-      run: |
-        reportgenerator \
-        "-reports:**/test-results.trx" \
-        "-targetdir:TestReport" \
-        "-reporttypes:Html"
+      run: reportgenerator "-reports:**/test-results.trx" "-targetdir:TestReport" "-reporttypes:Html"
 
 
     # 9. Upload HTML Report
@@ -83,6 +76,4 @@ jobs:
       if: always()
       with:
         name: Playwright-Screenshots-Traces
-        path: |
-          test-results/
-          trace.zip
+        path: test-results/
