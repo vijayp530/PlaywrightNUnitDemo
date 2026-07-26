@@ -49,30 +49,53 @@ public class BaseTest
     }
 
     [TearDown]
-    public async Task TearDown()
+public async Task TearDown()
+{
+    Console.WriteLine("====== TearDown Started ======");
+
+    if (Context is null)
     {
-        if (Context is null)
-            return;
+        Console.WriteLine("Context is null");
+        return;
+    }
 
-        var currentContext = TestContext.CurrentContext;
-        var status = currentContext.Result.Outcome.Status;
+    var currentContext = TestContext.CurrentContext;
+    var status = currentContext.Result.Outcome.Status;
 
+    Console.WriteLine($"Status : {status}");
+    Console.WriteLine($"Working Directory : {Directory.GetCurrentDirectory()}");
+
+    try
+    {
         if (status == NUnit.Framework.Interfaces.TestStatus.Failed)
-        {   
-            Directory.CreateDirectory("test-results");
-           await Context.Tracing.StopAsync(new()
+        {
+            var folder = Path.Combine(Directory.GetCurrentDirectory(), "test-results");
+
+            Directory.CreateDirectory(folder);
+
+            var traceFile = Path.Combine(folder, $"{currentContext.Test.Name}-trace.zip");
+
+            Console.WriteLine($"Saving trace : {traceFile}");
+
+            await Context.Tracing.StopAsync(new()
             {
-                Path = Path.Combine("test-results",
-                $"{currentContext.Test.Name}-trace.zip")
+                Path = traceFile
             });
+
+            Console.WriteLine("Trace saved successfully");
         }
         else
         {
             await Context.Tracing.StopAsync();
         }
-
-        await Context.CloseAsync();
     }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.ToString());
+    }
+
+    await Context.CloseAsync();
+}
 
     [OneTimeTearDown]
     public async Task OneTimeTearDown()

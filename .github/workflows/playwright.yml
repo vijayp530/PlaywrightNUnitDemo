@@ -68,7 +68,20 @@ jobs:
       with:
         name: NUnit-HTML-Test-Report
         path: TestReport/
+      
+      - name: Debug generated files
+  	if: always()
+  	shell: pwsh
+  	run: Write-Host "Current Directory" 
+        Get-Location
 
+        Write-Host ""
+        Write-Host "Searching for trace files..."
+        Get-ChildItem -Recurse -Filter *.zip
+
+        Write-Host ""
+        Write-Host "Searching for test-results folder..."
+        Get-ChildItem -Recurse -Directory | Where-Object {$_.Name -eq "test-results"}
 
     # 10. Upload screenshots and traces
     - name: Upload Playwright Evidence
@@ -76,5 +89,5 @@ jobs:
       if: always()
       with:
         name: Playwright-Screenshots-Traces
-        path: test-results/
+        path: "**/test-results/**"
         if-no-files-found: ignore
