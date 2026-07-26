@@ -58,10 +58,12 @@ public class BaseTest
         var status = currentContext.Result.Outcome.Status;
 
         if (status == NUnit.Framework.Interfaces.TestStatus.Failed)
-        {
-            await Context.Tracing.StopAsync(new()
+        {   
+            Directory.CreateDirectory("test-results");
+           await Context.Tracing.StopAsync(new()
             {
-                Path = $"test-results/{currentContext.Test.Name}-trace.zip"
+                Path = Path.Combine("test-results",
+                $"{currentContext.Test.Name}-trace.zip")
             });
         }
         else

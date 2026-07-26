@@ -58,7 +58,7 @@ jobs:
 
     # 8. Convert TRX to HTML report
     - name: Generate HTML Test Report
-      run: reportgenerator "-reports:**/test-results.trx" "-targetdir:TestReport" "-reporttypes:Html"
+      run: reportgenerator "-reports:**/*.trx" "-targetdir:TestReport" "-reporttypes:Html"
 
 
     # 9. Upload HTML Report
@@ -77,3 +77,4 @@ jobs:
       with:
         name: Playwright-Screenshots-Traces
         path: test-results/
+        if-no-files-found: ignore
