@@ -28,6 +28,6 @@ public class LoginTests : BaseTest
         await homePage.OpenAsync(baseUrl);
         var title = await homePage.GetTitleAsync();
 
-        Assert.That(title, Does.Contain("Google"));
+        Assert.That(title, Does.Contain("Swag Labs"));
     }
 }
