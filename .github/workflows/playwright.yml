@@ -12,7 +12,7 @@ on:
 
 jobs:
 
-  test:
+  test_job:
 
     runs-on: windows-latest
 
