@@ -1,0 +1,11 @@
+bin/
+obj/
+playwright-report/
+test-results/
+*.user
+*.suo
+.vs/
+.idea/
+.specify/
+.github/
+.vscode/
