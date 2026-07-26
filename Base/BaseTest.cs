@@ -37,16 +37,39 @@ public class BaseTest
                     Height = ConfigReader.GetViewportHeight()
                 }
             });
+
+        await Context.Tracing.StartAsync(new()
+            {
+                Screenshots = true,
+                Snapshots = true,
+                Sources = true
+            });  
+
         Page = await Context.NewPageAsync();
     }
 
     [TearDown]
     public async Task TearDown()
     {
-        if (Context is not null)
+        if (Context is null)
+            return;
+
+        var currentContext = TestContext.CurrentContext;
+        var status = currentContext.Result.Outcome.Status;
+
+        if (status == NUnit.Framework.Interfaces.TestStatus.Failed)
         {
-            await Context.CloseAsync();
+            await Context.Tracing.StopAsync(new()
+            {
+                Path = $"test-results/{currentContext.Test.Name}-trace.zip"
+            });
         }
+        else
+        {
+            await Context.Tracing.StopAsync();
+        }
+
+        await Context.CloseAsync();
     }
 
     [OneTimeTearDown]

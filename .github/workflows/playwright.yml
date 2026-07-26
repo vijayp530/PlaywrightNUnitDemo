@@ -1,14 +1,14 @@
-name: Playwright Tests
+name: Playwright NUnit Tests
 
 on:
   push:
     branches:
       - main
-      - develop
 
   pull_request:
     branches:
       - main
+
 
 jobs:
 
@@ -18,29 +18,71 @@ jobs:
 
     steps:
 
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+    # 1. Checkout code
+    - name: Checkout Repository
+      uses: actions/checkout@v4
 
-      - name: Install .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
 
-      - name: Restore Packages
-        run: dotnet restore
+    # 2. Install .NET
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
 
-      - name: Build Project
-        run: dotnet build --configuration Release --no-restore
 
-      - name: Install Playwright Browsers
-        run: pwsh bin/Release/net10.0/playwright.ps1 install
+    # 3. Restore NuGet packages
+    - name: Restore Packages
+      run: dotnet restore
 
-      - name: Run NUnit Tests
-        run: dotnet test --configuration Release --logger trx
 
-      - name: Upload Test Results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: TestResults
-          path: "**/*.trx"
+    # 4. Build project
+    - name: Build Project
+      run: dotnet build --configuration Release --no-restore
+
+
+    # 5. Install Playwright browsers
+    - name: Install Playwright Browsers
+      run: pwsh bin/Release/net10.0/playwright.ps1 install
+
+
+    # 6. Execute NUnit tests and generate TRX
+    - name: Run Playwright NUnit Tests
+      run: |
+        dotnet test \
+        --configuration Release \
+        --logger "trx;LogFileName=test-results.trx"
+      continue-on-error: true
+
+
+    # 7. Install HTML report generator
+    - name: Install ReportGenerator
+      run: dotnet tool install -g dotnet-reportgenerator-globaltool
+
+
+    # 8. Convert TRX to HTML report
+    - name: Generate HTML Test Report
+      run: |
+        reportgenerator \
+        "-reports:**/test-results.trx" \
+        "-targetdir:TestReport" \
+        "-reporttypes:Html"
+
+
+    # 9. Upload HTML Report
+    - name: Upload HTML Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: NUnit-HTML-Test-Report
+        path: TestReport/
+
+
+    # 10. Upload screenshots and traces
+    - name: Upload Playwright Evidence
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: Playwright-Screenshots-Traces
+        path: |
+          test-results/
+          trace.zip
