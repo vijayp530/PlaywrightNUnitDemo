@@ -65,8 +65,7 @@ public class BaseTest
         {   
            await Context.Tracing.StopAsync(new()
             {
-                Path = Path.Combine("test-results",
-                $"{currentContext.Test.Name}-trace.zip")
+                Path = Path.Combine(folder, $"{currentContext.Test.Name}-trace.zip")
             });
         }
         else
