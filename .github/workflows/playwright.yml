@@ -68,22 +68,22 @@ jobs:
       with:
         name: NUnit-HTML-Test-Report
         path: TestReport/
-      
-      - name: Debug generated files
-  	if: always()
-  	shell: pwsh
-  	run: Write-Host "Current Directory" 
-        Get-Location
 
+    # 10. Debug generated files
+    - name: Debug generated files
+      if: always()
+      shell: pwsh
+      run: |
+        Write-Host "Current Directory"
+        Get-Location
         Write-Host ""
         Write-Host "Searching for trace files..."
         Get-ChildItem -Recurse -Filter *.zip
-
         Write-Host ""
         Write-Host "Searching for test-results folder..."
         Get-ChildItem -Recurse -Directory | Where-Object {$_.Name -eq "test-results"}
 
-    # 10. Upload screenshots and traces
+    # 11. Upload screenshots and traces
     - name: Upload Playwright Evidence
       uses: actions/upload-artifact@v4
       if: always()
